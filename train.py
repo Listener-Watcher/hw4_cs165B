@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 100
+num_epochs = 60
 batch_size = 128
 early_stop = 5
 learning_rate = 0.01
@@ -17,7 +17,7 @@ learning_rate = 0.01
 def adjust_learning_rate(optimizer, epoch):
     global learning_rate
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    learning_rate = learning_rate * (0.1 ** (epoch // 40))
+    learning_rate = learning_rate * (0.1 ** (epoch // 8))
     for param_group in optimizer.param_groups:
         param_group['lr'] = learning_rate
 data_transform = transforms.Compose([
@@ -71,7 +71,7 @@ def load_checkpoint(model, optimizer, filename):
 # model = FashionSimpleNet()
 # model = CNN2()
 # model = models.alexnet()
-model = models.CNN2()
+model = CNN2()
 model.cuda()
 # If you want to finetune only top layer of the model.
 # for param in resnet.parameters():
@@ -151,4 +151,4 @@ plt.plot(epoch_count,val_loss,c="r")
 plt.show()
 model.load_state_dict(best_model_wts)
 # Save the Trained Model
-torch.save(model.state_dict(), 'cnn2_'+num_epochs+'.pkl')
+torch.save(model.state_dict(), 'cnn2_'+str(num_epochs)+'.pkl')

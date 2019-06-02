@@ -36,7 +36,7 @@ class CNN(nn.Module):
         return out
 class CNN2(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()
+        super(CNN2, self).__init__()
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=1,out_channels=16,kernel_size=5,stride=1,padding=2),
             nn.BatchNorm2d(16),
@@ -63,7 +63,7 @@ class CNN2(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout(p=0.5),
             )
-        self.fc = nn.Linear(16*16*32, 10) # originall is 7*7*32
+        self.fc = nn.Linear(2*2*32, 10) # originall is 7*7*32
         
     def forward(self, x):
         out = self.layer1(x)

@@ -33,6 +33,6 @@ for i in range(0,10000):
     # img = img.type(torch.FloatTensor)
 
     input.append(img)
-with open('processed_data_dense.txt','wb') as fp:
+with open('processed_data_cnn2.txt','wb') as fp:
 	pickle.dump(input,fp)
 

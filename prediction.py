@@ -41,6 +41,7 @@ from skimage.transform import resize
 from PIL import Image
 import torchvision.models as models
 import pickle
+from model import *
 # input = []
 # for i in range(0,10000):
 #     filename = "./hw4_test/"
@@ -58,14 +59,14 @@ import pickle
 
 #     input.append(img)
 
-model_path = "./xxx.pkl"
+model_path = "./cnn2_60.pkl"
 input = []
 print(model_path)
 if(model_path == "model.pkl"):
     with open ('processed_data_v2.txt', 'rb') as fp:
         input = pickle.load(fp)
 else:
-    with open ('processed_data_dense.txt', 'rb') as fp:
+    with open ('processed_data_cnn2.txt', 'rb') as fp:
         input = pickle.load(fp)
 # data_transform = transforms.Compose([
 #         transforms.Grayscale(num_output_channels=1),
@@ -83,9 +84,7 @@ else:
 #     model = FashionSimpleNet()
 # else:
 #     model = CNN()
-model = models.resnet152()
-numflt = model.fc.in_features
-model.fc = nn.Linear(numflt,10)
+model = CNN2()
 model = model.cuda()
 def load_checkpoint(model, filename):
     checkpoint = torch.load(filename)
