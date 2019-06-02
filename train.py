@@ -100,6 +100,8 @@ for epoch in range(num_epochs):
         else:
             model.eval()
         running_loss = 0.0
+        label_corrects = [1]*10
+        label_count = [1]*10
         running_corrects = 0
         size = 0
         for (images, labels) in (data_loader[phase]):
@@ -117,9 +119,15 @@ for epoch in range(num_epochs):
                 if phase==0:
                     loss.backward()
                     optimizer.step()
+                if phase==1:
+                    label_corrects[labels]+=(preds==labels.data)
+                    label_count[labels]+=1
     #statistics
         running_loss+=loss.item()
         running_corrects=torch.sum(preds==labels.data)
+        for i in range(0,10):
+            ave_corrects += (label_corrects[i].double()/label_count[i])
+        ave_corrects = ave_corrects/10
     # epoch_loss = running_loss/len(data_loader[phase].dataset)
     # epoch_acc = running_corrects.double()/len(data_loader[phase].dataset)
         run_loss = running_loss
@@ -131,9 +139,9 @@ for epoch in range(num_epochs):
         else:
             val_loss.append(run_loss)
         if(phase==0):
-            print('training loss: {:.8f} epoch_acc: {:.4f}'.format(run_loss/train_size,epoch_acc/train_size))
+            print('training loss: {:.8f} epoch_acc: {:.8f}'.format(run_loss/train_size,epoch_acc/train_size))
         else:
-            print('validation loss: {:.8f} epoch_acc: {:.4f}'.format(run_loss/test_size,epoch_acc/test_size))
+            print('validation loss: {:.8f} epoch_acc: {:.8f} ave_corrects:{:.8f}'.format(run_loss/test_size,epoch_acc/test_size,ave_corrects))
     if epoch_acc >= best_acc:
         early_stop = 5
         best_acc = epoch_acc

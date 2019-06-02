@@ -19,13 +19,6 @@ class CNN(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout(p=0.5)
             )
-        # self.layer3 = nn.Sequential(
-        #     nn.Conv2d(32,64,kernel_size=5,padding=2),
-        #     nn.BatchNorm2d(64),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2),
-        #     # nn.Dropout(p=0.5),
-        #     )
         self.fc = nn.Linear(16*16*32, 10) # originall is 7*7*32
         
     def forward(self, x):
