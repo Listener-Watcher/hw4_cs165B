@@ -7,8 +7,9 @@ import torchvision.models as models
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
+from model import *
 # Hyper Parameters
-num_epochs = 5
+num_epochs = 100
 batch_size = 128
 early_stop = 5
 learning_rate = 0.01
@@ -16,11 +17,11 @@ learning_rate = 0.01
 def adjust_learning_rate(optimizer, epoch):
     global learning_rate
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    learning_rate = learning_rate * (0.1 ** (epoch // 18))
+    learning_rate = learning_rate * (0.1 ** (epoch // 40))
     for param_group in optimizer.param_groups:
         param_group['lr'] = learning_rate
 data_transform = transforms.Compose([
-        # transforms.Grayscale(num_output_channels=1),
+        transforms.Grayscale(num_output_channels=1),
         # transforms.Resize(64),
         # transforms.CenterCrop(64),
         transforms.ToTensor(),
@@ -70,9 +71,7 @@ def load_checkpoint(model, optimizer, filename):
 # model = FashionSimpleNet()
 # model = CNN2()
 # model = models.alexnet()
-model = models.resnet152()
-numflt = model.fc.in_features
-model.fc = nn.Linear(numflt,10)
+model = models.CNN2()
 model.cuda()
 # If you want to finetune only top layer of the model.
 # for param in resnet.parameters():
@@ -142,8 +141,8 @@ for epoch in range(num_epochs):
         # save_checkpoint(model, optimizer, epoch, "save_model_"+str(epoch))
     else:
         early_stop -= 1
-        if(early_stop==0):
-            save_checkpoint(model, optimizer, epoch, "cnn2_save_model_"+str(epoch))
+        # if(early_stop==0):
+        #     save_checkpoint(model, optimizer, epoch, "cnn2_save_model_"+str(epoch))
 
 print()
 plt.plot(epoch_count,train_loss,c="b")
@@ -152,4 +151,4 @@ plt.plot(epoch_count,val_loss,c="r")
 plt.show()
 model.load_state_dict(best_model_wts)
 # Save the Trained Model
-torch.save(model.state_dict(), 'cnn2.pkl')
+torch.save(model.state_dict(), 'cnn2_'+num_epochs+'.pkl')
