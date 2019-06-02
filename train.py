@@ -3,14 +3,22 @@ import torch.nn as nn
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
 from torch.autograd import Variable
-from model import *
 import torchvision.models as models
 import copy
+import numpy as np
+import matplotlib.pyplot as plt
 # Hyper Parameters
-num_epochs = 30
+num_epochs = 5
 batch_size = 128
-learning_rate = 0.0001
+early_stop = 5
+learning_rate = 0.01
 #preprocessing Dataset
+def adjust_learning_rate(optimizer, epoch):
+    global learning_rate
+    """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+    learning_rate = learning_rate * (0.1 ** (epoch // 18))
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = learning_rate
 data_transform = transforms.Compose([
         # transforms.Grayscale(num_output_channels=1),
         # transforms.Resize(64),
@@ -38,12 +46,33 @@ data_loader.append(valid_loader)
 # image,label = train_iter.next()
 # print('images shape on batch size = {}'.format(image.size()))
 # print('labels shape on batch size = {}'.format(label.size()))
+def save_checkpoint(model, optimizer, epoch, filename):
+    state = {"model_state_dict": model.state_dict(),
+             "optimizer": optimizer.state_dict(),
+             "epoch": epoch}
+    
+    torch.save(state, filename)
+
+def load_checkpoint(model, optimizer, filename):
+    checkpoint = torch.load(filename)
+    start_epoch = checkpoint["epoch"]
+    model.load_state_dict(checkpoint["model_state_dict"])
+    model = model.cuda()
+
+    optimizer.load_state_dict(checkpoint["optimizer"])
+    for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.cuda()
 
 # CNN Model (2 conv layer)
 # model = CNN()
 # model = FashionSimpleNet()
-model = models.resnet18()
+# model = CNN2()
 # model = models.alexnet()
+model = models.resnet152()
+numflt = model.fc.in_features
+model.fc = nn.Linear(numflt,10)
 model.cuda()
 # If you want to finetune only top layer of the model.
 # for param in resnet.parameters():
@@ -57,10 +86,15 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 # optimizer = torch.optim.Adam(model.parameters())
 # Train the Model
 best_acc = 0.0
+val_loss =[]
+train_loss = []
+epoch_count = []
 best_model_wts = copy.deepcopy(model.state_dict())
 for epoch in range(num_epochs):
     print('Epoch {}/{}'.format(epoch+1,num_epochs))
     print('-'*10)
+    epoch_count.append(epoch)
+    adjust_learning_rate(optimizer, epoch)
     for phase in [0, 1]:
         if phase == 0:
             model.train()
@@ -68,6 +102,7 @@ for epoch in range(num_epochs):
             model.eval()
         running_loss = 0.0
         running_corrects = 0
+        size = 0
         for (images, labels) in (data_loader[phase]):
             images = Variable(images).cuda()
             labels = Variable(labels).cuda() 
@@ -75,6 +110,7 @@ for epoch in range(num_epochs):
             # labels = Variable(labels)    
             # Forward + Backward + Optimize
             optimizer.zero_grad()
+            size +=1
             with torch.set_grad_enabled(phase==0):
                 outputs = model(images)
                 loss = criterion(outputs, labels)
@@ -84,26 +120,36 @@ for epoch in range(num_epochs):
                     optimizer.step()
     #statistics
         running_loss+=loss.item()
-        running_corrects+=torch.sum(preds==labels.data)
+        running_corrects=torch.sum(preds==labels.data)
     # epoch_loss = running_loss/len(data_loader[phase].dataset)
     # epoch_acc = running_corrects.double()/len(data_loader[phase].dataset)
-        run_loss = running_loss/len(data_loader[phase])
-        epoch_loss = running_loss/len(data_loader[phase].dataset)
-        epoch_acc = running_corrects.double()/len(data_loader[phase].dataset)
+        run_loss = running_loss
+        # epoch_loss = running_loss/len(data_loader[phase].dataset)
+        epoch_acc = running_corrects.double()
+        # acc = np.mean(running_corrects)
         if(phase==0):
-            print('training loss: {:.4f} running_Loss: {:.4f} Acc:{:.4f}'.format(run_loss,epoch_loss,epoch_acc))
+            train_loss.append(run_loss)
         else:
-            print('validation loss: {:.4f} running_Loss: {:.4f} Acc:{:.4f}'.format(run_loss,epoch_loss,epoch_acc))
-    if phase == 1 and epoch_acc > best_acc:
+            val_loss.append(run_loss)
+        if(phase==0):
+            print('training loss: {:.8f} epoch_acc: {:.4f}'.format(run_loss/train_size,epoch_acc/train_size))
+        else:
+            print('validation loss: {:.8f} epoch_acc: {:.4f}'.format(run_loss/test_size,epoch_acc/test_size))
+    if epoch_acc >= best_acc:
+        early_stop = 5
         best_acc = epoch_acc
         best_model_wts = copy.deepcopy(model.state_dict())
+        # save_checkpoint(model, optimizer, epoch, "save_model_"+str(epoch))
+    else:
+        early_stop -= 1
+        if(early_stop==0):
+            save_checkpoint(model, optimizer, epoch, "cnn2_save_model_"+str(epoch))
+
 print()
-        # if (i+1) % 50 == 0:
-        #     print("Epoch {}/{}, Loss: {:.3f}".format(epoch+1,num_epochs, loss.item()))
-        # if (i+1) %100 == 0:
-        #     valid(model,valid_loader,criterion)
-    # loss_train.append(train(cnn,train_loader,criterion,optimizer))
-    # loss_valid.append(valid(cnn,valid_loader,criterion))
+plt.plot(epoch_count,train_loss,c="b")
+plt.show()
+plt.plot(epoch_count,val_loss,c="r")
+plt.show()
 model.load_state_dict(best_model_wts)
 # Save the Trained Model
-torch.save(model.state_dict(), 'cnn.pkl')
+torch.save(model.state_dict(), 'cnn2.pkl')

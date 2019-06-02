@@ -1,5 +1,3 @@
-# Starter code for CS 165B HW4
-
 """
 Implement the testing procedure here. 
 
@@ -40,8 +38,8 @@ from torch.autograd import Variable
 import imageio
 from skimage.color import rgb2gray
 from skimage.transform import resize
-from model import *
 from PIL import Image
+import torchvision.models as models
 import pickle
 # input = []
 # for i in range(0,10000):
@@ -60,14 +58,14 @@ import pickle
 
 #     input.append(img)
 
-model_path = "./cnn.pkl"
+model_path = "./xxx.pkl"
 input = []
 print(model_path)
 if(model_path == "model.pkl"):
     with open ('processed_data_v2.txt', 'rb') as fp:
         input = pickle.load(fp)
 else:
-    with open ('processed_data.txt', 'rb') as fp:
+    with open ('processed_data_dense.txt', 'rb') as fp:
         input = pickle.load(fp)
 # data_transform = transforms.Compose([
 #         transforms.Grayscale(num_output_channels=1),
@@ -81,12 +79,31 @@ else:
 # test_loader = torch.utils.data.DataLoader(test_dataset,batch_size = 100, shuffle=True,)
 
 # model = CNN()
-if(model_path == "model.pkl"):
-    model = FashionSimpleNet()
-else:
-    model = CNN()
-model.cuda()
-model.load_state_dict(torch.load(model_path))
+# if(model_path == "model.pkl"):
+#     model = FashionSimpleNet()
+# else:
+#     model = CNN()
+model = models.resnet152()
+numflt = model.fc.in_features
+model.fc = nn.Linear(numflt,10)
+model = model.cuda()
+def load_checkpoint(model, filename):
+    checkpoint = torch.load(filename)
+    start_epoch = checkpoint["epoch"]
+    model.load_state_dict(checkpoint["model_state_dict"])
+    model = model.cuda()
+
+    # optimizer.load_state_dict(checkpoint["optimizer"])
+    # for state in optimizer.state.values():
+    #         for k, v in state.items():
+    #             if isinstance(v, torch.Tensor):
+    #                 state[k] = v.cuda()
+
+
+# model = CNN()
+# model.cuda()
+# model.load_state_dict(torch.load(model_path))
+# load_checkpoint(model,"save_model_167")
 model.eval()  # Change model to 'eval' mode (BN uses moving mean/var).
 # for images, labels in test_loader:
 #     images = Variable(images)
@@ -99,7 +116,6 @@ for images in input:
     outputs = model(images)
     _, predicted = torch.max(outputs.data, 1)
     output.append(predicted[0].item())
-
 print(output)
 print(len(output))
 f = open("prediction.txt","a")
