@@ -1,3 +1,4 @@
+all training samples number:50400
 250,
 0.000001
 cnn2,
@@ -12,9 +13,30 @@ cnn2,
 adjust learning rate with 15
 score:82.1
 -----------
-50,
-0.001
+60,
+0.003
 cnn2,
 256,
 adjust learning rate with 15
+score:91.19
+------------
+196,
+0.003
+cnn2,
+256
+adjust learning rate with 30
+score:91.19
+-------------
+60,
+0.003
+resnet152,
+512
+adjust learning rate with 15
+score:86.
+-------------
+196
+0.003
+resnet152
+256
+adjust learning rate with 40
 score:
