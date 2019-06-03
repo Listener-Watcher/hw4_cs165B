@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 200
+num_epochs = 50
 batch_size = 128
 early_stop = 5
-learning_rate = 0.000001  #???0.000001
+learning_rate = 0.001  #???0.000001
 # fix random seed
 
 torch.manual_seed(0)
@@ -23,7 +23,7 @@ np.random.seed(0)
 def adjust_learning_rate(optimizer, epoch):
     global learning_rate
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    learning_rate = learning_rate * (0.1 ** (epoch // 8))
+    learning_rate = learning_rate * (0.1 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = learning_rate
 

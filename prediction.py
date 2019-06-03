@@ -59,7 +59,7 @@ with open ('processed_data.txt', 'rb') as fp:
 print(input[0][0][0][0])
 model = CNN2()
 model.cuda()
-# model.load_state_dict(torch.load(model_path))
+model.load_state_dict(torch.load(model_path))
 # load_checkpoint(model,"save_model_167")
 model.eval() 
 output = []
