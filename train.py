@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 250
-batch_size = 128
+num_epochs = 60
+batch_size = 256
 early_stop = 5
-learning_rate = 0.000001  #???0.000001
+learning_rate = 0.003
 # fix random seed
 
 torch.manual_seed(0)
@@ -90,7 +90,7 @@ for epoch in range(num_epochs):
     print('Epoch {}/{}'.format(epoch+1,num_epochs))
     print('-'*10)
     epoch_count.append(epoch)
-    # adjust_learning_rate(optimizer, epoch)
+    adjust_learning_rate(optimizer, epoch)
     for phase in [0, 1]:
         if phase == 0:
             model.train()
