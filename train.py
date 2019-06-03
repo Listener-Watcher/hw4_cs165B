@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 30
+num_epochs = 200
 batch_size = 128
 early_stop = 5
-learning_rate = 0.00001  #???0.000001
+learning_rate = 0.000001  #???0.000001
 # fix random seed
 
 torch.manual_seed(0)
@@ -49,11 +49,6 @@ valid_loader = torch.utils.data.DataLoader(test_dataset,
                                              )
 data_loader.append(train_loader)
 data_loader.append(valid_loader)
-# train_iter = iter(train_loader)
-# print(type(train_iter))
-# image,label = train_iter.next()
-# print('images shape on batch size = {}'.format(image.size()))
-# print('labels shape on batch size = {}'.format(label.size()))
 def save_checkpoint(model, optimizer, epoch, filename):
     state = {"model_state_dict": model.state_dict(),
              "optimizer": optimizer.state_dict(),
@@ -78,7 +73,7 @@ def load_checkpoint(model, optimizer, filename):
 # model = FashionSimpleNet()
 #model = models.resnet52()
 #model.fc = nn.Linear(model.fc.in_features, 10)
-model = CNN()
+model = CNN2()
 model.cuda()
 
 # Loss and Optimizer

@@ -28,9 +28,9 @@ for i in range(0,10000):
     # another way to process
     img = Image.open(filename)
     img = img.getdata()
-    data = np.array(img,dtype='f')
+    data = np.array(img,dtype='float64')
     data = np.reshape(data,(28,28))
-    data = (data-0.5*255)/(0.5*255)
+    data = (data-127.5)/(127.5)
     img = [[data]]
     img = torch.tensor(img)
     img = img.type(torch.FloatTensor)
