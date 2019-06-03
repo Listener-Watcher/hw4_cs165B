@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 60
+num_epochs = 30
 batch_size = 128
 early_stop = 5
-learning_rate = 0.01
+learning_rate = 0.00001  #???0.000001
 # fix random seed
 
 torch.manual_seed(0)
@@ -29,11 +29,11 @@ def adjust_learning_rate(optimizer, epoch):
 
 
 data_transform = transforms.Compose([
-        # transforms.Grayscale(num_output_channels=1),
-        transforms.Resize((28,28)),
+        transforms.Grayscale(num_output_channels=1),
+        transforms.Resize(28,28),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5,0,5,0,5],
-                             std=[0.5,0,5,0,5])
+        #transforms.Normalize(mean=[0.5],
+                            # std=[0.5])
     ])
 train_dataset = dsets.ImageFolder(root='./hw4_train',transform=data_transform)
 train_size = int(0.8 * len(train_dataset))
@@ -78,7 +78,7 @@ def load_checkpoint(model, optimizer, filename):
 # model = FashionSimpleNet()
 #model = models.resnet52()
 #model.fc = nn.Linear(model.fc.in_features, 10)
-model = CNN2()
+model = CNN()
 model.cuda()
 
 # Loss and Optimizer
@@ -102,8 +102,6 @@ for epoch in range(num_epochs):
         else:
             model.eval()
         running_loss = 0.0
-        label_corrects = [1]*10
-        label_count = [1]*10
         running_corrects = 0
         size = 0
         for (images, labels) in (data_loader[phase]):
@@ -121,15 +119,9 @@ for epoch in range(num_epochs):
                 if phase==0:
                     loss.backward()
                     optimizer.step()
-                if phase==1:
-                    label_corrects[labels]+=(preds==labels.data)
-                    label_count[labels]+=1
     #statistics
         running_loss+=loss.item()
         running_corrects=torch.sum(preds==labels.data)
-        for i in range(0,10):
-            ave_corrects += (label_corrects[i].double()/label_count[i])
-        ave_corrects = ave_corrects/10
     # epoch_loss = running_loss/len(data_loader[phase].dataset)
     # epoch_acc = running_corrects.double()/len(data_loader[phase].dataset)
         run_loss = running_loss
@@ -143,7 +135,7 @@ for epoch in range(num_epochs):
         if(phase==0):
             print('training loss: {:.8f} epoch_acc: {:.8f}'.format(run_loss/train_size,epoch_acc/train_size))
         else:
-            print('validation loss: {:.8f} epoch_acc: {:.8f} ave_corrects:{:.8f}'.format(run_loss/test_size,epoch_acc/test_size,ave_corrects))
+            print('validation loss: {:.8f} epoch_acc: {:.8f}'.format(run_loss/test_size,epoch_acc/test_size))
     if epoch_acc >= best_acc:
         early_stop = 5
         best_acc = epoch_acc

@@ -49,15 +49,14 @@ def load_checkpoint(model, filename):
     start_epoch = checkpoint["epoch"]
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.cuda()
-
-
-model_path = "./cnn2_60.pkl"
+import sys
+model_path  = "./cnn2_"+str(sys.argv[1])+".pkl"
 input = []
 print(model_path)
 with open ('processed_data.txt', 'rb') as fp:
     input = pickle.load(fp)
 
-
+print(input[0][0][0][0])
 model = CNN()
 model.cuda()
 # model.load_state_dict(torch.load(model_path))

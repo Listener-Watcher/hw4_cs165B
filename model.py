@@ -19,7 +19,7 @@ class CNN(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout(p=0.5)
             )
-        self.fc = nn.Linear(16*16*32, 10) # originall is 7*7*32
+        self.fc = nn.Linear(1568, 10) # originall is 7*7*32
         
     def forward(self, x):
         out = self.layer1(x)
@@ -48,7 +48,7 @@ class CNN2(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout(p=0.5),
             )
-        self.fc = nn.Linear(4*4*32, 10) # originall is 7*7*32
+        self.fc = nn.Linear(576, 10) # originall is 7*7*32
         
     def forward(self, x):
         out = self.layer1(x)
