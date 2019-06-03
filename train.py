@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 50
+num_epochs = 250
 batch_size = 128
 early_stop = 5
-learning_rate = 0.001  #???0.000001
+learning_rate = 0.000001  #???0.000001
 # fix random seed
 
 torch.manual_seed(0)
