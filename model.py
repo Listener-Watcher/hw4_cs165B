@@ -40,7 +40,6 @@ class CNN2(nn.Module):
             nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(2),
-            nn.Dropout(p=0.5)
             )
         self.layer3 = nn.Sequential(
             nn.Conv2d(32,64,kernel_size=5,padding=2),
@@ -49,25 +48,17 @@ class CNN2(nn.Module):
             nn.MaxPool2d(2),
             nn.Dropout(p=0.5),
             )
-        self.layer4 = nn.Sequential(
-            nn.Conv2d(64,128,kernel_size=5,padding=2),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.MaxPool2d(2),
-            nn.Dropout(p=0.5),
-            )
-        self.fc = nn.Linear(2*2*32, 10) # originall is 7*7*32
+        self.fc = nn.Linear(4*4*32, 10) # originall is 7*7*32
         
     def forward(self, x):
         out = self.layer1(x)
         out = self.layer2(out)
         out = self.layer3(out)
-        out = self.layer4(out)
         out = out.view(out.size(0), -1)
         out = self.fc(out)
         return out
 #cnn model, 10 epoch, 100 batch size, 0.005 learning rate
-class FashionSimpleNet(nn.Module):
+class CNN3(nn.Module):
 
     """ Simple network"""
 

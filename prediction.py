@@ -42,73 +42,27 @@ from PIL import Image
 import torchvision.models as models
 import pickle
 from model import *
-# input = []
-# for i in range(0,10000):
-#     filename = "./hw4_test/"
-#     filename = filename+str(i)+".png"
-#     img = imageio.imread(filename)
-#     img = resize(img,(64,64),mode='constant',anti_aliasing=True)
-#     img = rgb2gray(img)
-#     img = [[img]]
-#     img = torch.tensor(img)
-#     img = img.type(torch.FloatTensor)
-#     img = (img-0.5)/0.5
-#     # img = Image.open(filename)
-#     # img = img.getdata()
-#     # img = Image.resize((64,64))
 
-#     input.append(img)
 
-model_path = "./cnn2_60.pkl"
-input = []
-print(model_path)
-if(model_path == "model.pkl"):
-    with open ('processed_data_v2.txt', 'rb') as fp:
-        input = pickle.load(fp)
-else:
-    with open ('processed_data_cnn2.txt', 'rb') as fp:
-        input = pickle.load(fp)
-# data_transform = transforms.Compose([
-#         transforms.Grayscale(num_output_channels=1),
-#         transforms.Resize(64),
-#         transforms.CenterCrop(64),
-#         transforms.ToTensor(),
-#         transforms.Normalize(mean=[0.5],
-#                              std=[0.5])
-#     ])
-# test_dataset = dsets.ImageFolder(root='./hw4_test',transform=data_transform)
-# test_loader = torch.utils.data.DataLoader(test_dataset,batch_size = 100, shuffle=True,)
-
-# model = CNN()
-# if(model_path == "model.pkl"):
-#     model = FashionSimpleNet()
-# else:
-#     model = CNN()
-model = CNN2()
-model = model.cuda()
 def load_checkpoint(model, filename):
     checkpoint = torch.load(filename)
     start_epoch = checkpoint["epoch"]
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.cuda()
 
-    # optimizer.load_state_dict(checkpoint["optimizer"])
-    # for state in optimizer.state.values():
-    #         for k, v in state.items():
-    #             if isinstance(v, torch.Tensor):
-    #                 state[k] = v.cuda()
+
+model_path = "./cnn2_60.pkl"
+input = []
+print(model_path)
+with open ('processed_data.txt', 'rb') as fp:
+    input = pickle.load(fp)
 
 
-# model = CNN()
-# model.cuda()
+model = CNN()
+model.cuda()
 # model.load_state_dict(torch.load(model_path))
 # load_checkpoint(model,"save_model_167")
-model.eval()  # Change model to 'eval' mode (BN uses moving mean/var).
-# for images, labels in test_loader:
-#     images = Variable(images)
-#     outputs = cnn(images)
-#     _, predicted = torch.max(outputs.data, 1)
-# picture = Variable(picture).cuda()
+model.eval() 
 output = []
 for images in input:
     images = Variable(images).cuda()

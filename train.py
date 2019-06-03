@@ -13,6 +13,12 @@ num_epochs = 60
 batch_size = 128
 early_stop = 5
 learning_rate = 0.01
+# fix random seed
+
+torch.manual_seed(0)
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
+np.random.seed(0)
 #preprocessing Dataset
 def adjust_learning_rate(optimizer, epoch):
     global learning_rate
@@ -20,13 +26,14 @@ def adjust_learning_rate(optimizer, epoch):
     learning_rate = learning_rate * (0.1 ** (epoch // 8))
     for param_group in optimizer.param_groups:
         param_group['lr'] = learning_rate
+
+
 data_transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),
-        # transforms.Resize(64),
-        # transforms.CenterCrop(64),
+        # transforms.Grayscale(num_output_channels=1),
+        transforms.Resize((28,28)),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5],
-                             std=[0.5])
+        transforms.Normalize(mean=[0.5,0,5,0,5],
+                             std=[0.5,0,5,0,5])
     ])
 train_dataset = dsets.ImageFolder(root='./hw4_train',transform=data_transform)
 train_size = int(0.8 * len(train_dataset))
@@ -69,16 +76,11 @@ def load_checkpoint(model, optimizer, filename):
 # CNN Model (2 conv layer)
 # model = CNN()
 # model = FashionSimpleNet()
-# model = CNN2()
-# model = models.alexnet()
+#model = models.resnet52()
+#model.fc = nn.Linear(model.fc.in_features, 10)
 model = CNN2()
 model.cuda()
-# If you want to finetune only top layer of the model.
-# for param in resnet.parameters():
-#     param.requires_grad = False
-    
-# # Replace top layer for finetuning.
-# resnet.fc = nn.Linear(resnet.fc.in_features, 100)  # 100 is for example.
+
 # Loss and Optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -93,7 +95,7 @@ for epoch in range(num_epochs):
     print('Epoch {}/{}'.format(epoch+1,num_epochs))
     print('-'*10)
     epoch_count.append(epoch)
-    adjust_learning_rate(optimizer, epoch)
+    # adjust_learning_rate(optimizer, epoch)
     for phase in [0, 1]:
         if phase == 0:
             model.train()
@@ -149,8 +151,8 @@ for epoch in range(num_epochs):
         # save_checkpoint(model, optimizer, epoch, "save_model_"+str(epoch))
     else:
         early_stop -= 1
-        # if(early_stop==0):
-        #     save_checkpoint(model, optimizer, epoch, "cnn2_save_model_"+str(epoch))
+        if(early_stop==0):
+            save_checkpoint(model, optimizer, epoch, "cnn2_save_model_"+str(epoch))
 
 print()
 plt.plot(epoch_count,train_loss,c="b")
