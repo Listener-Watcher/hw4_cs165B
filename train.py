@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from model import *
 # Hyper Parameters
-num_epochs = 60
+num_epochs = 196
 batch_size = 256
 early_stop = 5
 learning_rate = 0.003
@@ -23,17 +23,17 @@ np.random.seed(0)
 def adjust_learning_rate(optimizer, epoch):
     global learning_rate
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    learning_rate = learning_rate * (0.1 ** (epoch // 15))
+    learning_rate = learning_rate * (0.1 ** (epoch // 40))
     for param_group in optimizer.param_groups:
         param_group['lr'] = learning_rate
 
 
 data_transform = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),
+        #transforms.Grayscale(num_output_channels=1),
         transforms.Resize(28,28),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.5],
-                            std=[0.5])
+        transforms.Normalize(mean=[0.5,0.5,0.5],
+                            std=[0.5,0.5,0.5])
     ])
 train_dataset = dsets.ImageFolder(root='./hw4_train',transform=data_transform)
 train_size = int(0.8 * len(train_dataset))
@@ -71,9 +71,9 @@ def load_checkpoint(model, optimizer, filename):
 # CNN Model (2 conv layer)
 # model = CNN()
 # model = FashionSimpleNet()
-#model = models.resnet52()
-#model.fc = nn.Linear(model.fc.in_features, 10)
-model = CNN2()
+model = models.resnet152()
+model.fc = nn.Linear(model.fc.in_features, 10)
+#model = CNN2()
 model.cuda()
 
 # Loss and Optimizer

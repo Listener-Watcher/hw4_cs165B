@@ -31,7 +31,7 @@ for i in range(0,10000):
     data = np.array(img,dtype='float64')
     data = np.reshape(data,(28,28))
     data = (data-127.5)/(127.5)
-    img = [[data]]
+    img = [[data,data,data]]
     img = torch.tensor(img)
     img = img.type(torch.FloatTensor)
 

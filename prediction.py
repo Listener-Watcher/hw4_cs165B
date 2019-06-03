@@ -57,7 +57,9 @@ with open ('processed_data.txt', 'rb') as fp:
     input = pickle.load(fp)
 
 print(input[0][0][0][0])
-model = CNN2()
+#model = CNN2()
+model = models.resnet152()
+model.fc = nn.Linear(model.fc.in_features,10)
 model.cuda()
 model.load_state_dict(torch.load(model_path))
 # load_checkpoint(model,"save_model_167")
