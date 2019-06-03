@@ -30,6 +30,7 @@ for i in range(0,10000):
     img = img.getdata()
     data = np.array(img,dtype='f')
     data = np.reshape(data,(28,28))
+    data = (data-0.5*255)/(0.5*255)
     img = [[data]]
     img = torch.tensor(img)
     img = img.type(torch.FloatTensor)

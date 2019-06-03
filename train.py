@@ -32,8 +32,8 @@ data_transform = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),
         transforms.Resize(28,28),
         transforms.ToTensor(),
-        #transforms.Normalize(mean=[0.5],
-                            # std=[0.5])
+        transforms.Normalize(mean=[0.5],
+                            std=[0.5])
     ])
 train_dataset = dsets.ImageFolder(root='./hw4_train',transform=data_transform)
 train_size = int(0.8 * len(train_dataset))
